@@ -1,24 +1,24 @@
-import {Button, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View} from "react-native";
+import {SafeAreaView, ScrollView, StyleSheet} from "react-native";
 import React, {useEffect, useState} from "react";
-import Constants from "expo-constants";
 import {Audio} from "expo-av";
 import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
+import SoundClient from "../../network/SoundClient";
+import SampleCard from "./SampleCard";
 
 type SamplesProps = {}
 
 export function SamplesScreen(props: SamplesProps) {
-
   const restClient = Container.get(RestClient)
+  const soundClient = Container.get(SoundClient)
 
   const [sampleMetadataList, setSampleMetadataList] = useState<SampleMetadata[]>([])
   const [sound, setSound] = useState<Audio.Sound>();
 
-  async function playSound() {
+  async function playSound(sampleName: string) {
     console.log('Loading Sound');
-    const { sound } = await Audio.Sound.createAsync( { uri: "https://easy-waver-jyn7b2y2ja-lm.a.run.app/files/guitar.wav"}, {}, null, true);
+    const sound = await soundClient.getSound(sampleName);
     setSound(sound);
-
     console.log('Playing Sound');
     await sound.playAsync();
   }
@@ -46,14 +46,13 @@ export function SamplesScreen(props: SamplesProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        {sampleMetadataList.map((sample, index) =>
-          <Text key={index}>{sample.name}</Text>)}
+      <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
+        {sampleMetadataList.map((sample, index) => {
+          return (
+            <SampleCard key={index} name={sample.name} onPress={() => playSound(sample.name)}></SampleCard>
+          )
+        })}
       </ScrollView>
-      <View style={styles.container}>
-        <Button title="Play Sound" onPress={playSound}/>
-      </View>
-
     </SafeAreaView>
   );
 
@@ -62,9 +61,14 @@ export function SamplesScreen(props: SamplesProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: Platform.OS === "ios" ? 0 : Constants.statusBarHeight,
+  },
+  scrollContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 20
+  },
+  scroll: {
+    width: '100%',
   }
 });

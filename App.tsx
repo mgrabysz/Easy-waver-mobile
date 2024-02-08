@@ -1,53 +1,41 @@
-import React, {useEffect, useState} from "react";
-import {Button, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View,} from "react-native";
-import RestClient from './network/RestClient'
-import Constants from "expo-constants";
-import {Container} from "typedi";
+import React from "react";
+import {LogBox,} from "react-native";
 import "reflect-metadata"
-import * as FileSystem from 'expo-file-system';
-import {EncodingType} from 'expo-file-system';
-import { Audio} from "expo-av";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import {SamplesScreen} from "./screens/samplesScreen/samplesScreen";
-import {PedalboardScreen} from "./screens/pedalboardScreen/pedalboardScreen";
+import {SamplesScreen} from "./screens/samplesScreen/SamplesScreen";
+import {PedalBoardScreen} from "./screens/pedalboardScreen/PedalBoardScreen";
 import {NavigationContainer} from "@react-navigation/native";
+import Entypo from '@expo/vector-icons/Entypo';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+
+LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({route}) => ({
+        tabBarHideOnKeyboard: true,
+        tabBarIcon: ({focused, color, size}) => {
+          if (route.name === 'My samples') {
+            return <Entypo name={"beamed-note"} size={size} color={color}/>
+          } else {
+            return <MaterialCommunityIcons name="sine-wave" size={size} color={color}/>
+          }
+        }
+      })}>
       <Tab.Screen name="My samples" component={SamplesScreen}/>
-      <Tab.Screen name="Pedalboard" component={PedalboardScreen}/>
+      <Tab.Screen name="Pedalboard" component={PedalBoardScreen}/>
     </Tab.Navigator>
   )
 }
+
 export default function App() {
 
   return (
-  <NavigationContainer>
-    <MyTabs/>
-  </NavigationContainer>
+    <NavigationContainer>
+      <MyTabs/>
+    </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: Platform.OS === "ios" ? 0 : Constants.statusBarHeight,
-  },
-  wrapperStyle: {
-    minHeight: 128,
-  },
-  buttonStyles: {
-    backgroundColor: "dodgerblue",
-  },
-  textStyles: {
-    fontSize: 20,
-    color: "white",
-    padding: 10,
-  },
-});

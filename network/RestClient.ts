@@ -1,6 +1,6 @@
 import axios from "axios"
 import {Service} from "typedi";
-
+import mockSamples from '../mockSamples.json'
 @Service()
 export default class RestClient {
 
@@ -10,9 +10,11 @@ export default class RestClient {
   }
 
   public async getSamplesMetadata(): Promise<SampleMetadata[]> {
-    const url = `${this.baseUrl}/files/`
-    const response = await axios.get(url)
-    return response.data
+    // mock
+    return mockSamples
+    // const url = `${this.baseUrl}/files/`
+    // const response = await axios.get(url)
+    // return response.data
   }
 
   // nie udało się

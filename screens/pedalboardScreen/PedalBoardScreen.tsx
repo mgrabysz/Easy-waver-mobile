@@ -1,6 +1,6 @@
 import {View, Text} from "react-native";
 
-export function PedalboardScreen() {
+export function PedalBoardScreen() {
   // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'samples', {intermediates: true})
   //   .then(() => console.log('finished dupa'))
   //   .then(() => FileSystem.downloadAsync(url, FileSystem.documentDirectory + 'samples/' + 'wave.wav'))
@@ -10,7 +10,7 @@ export function PedalboardScreen() {
   //   .catch(error => {throw error} )
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings!</Text>
+      <Text>Pedalboard!</Text>
     </View>
   );
 }
