@@ -1,42 +1,34 @@
 import React, {useEffect, useState} from "react";
-import {Platform, SafeAreaView, ScrollView, StyleSheet, Text, View,} from "react-native";
+import {Button, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View,} from "react-native";
 import RestClient from './network/RestClient'
 import Constants from "expo-constants";
 import {Container} from "typedi";
 import "reflect-metadata"
+import * as FileSystem from 'expo-file-system';
+import {EncodingType} from 'expo-file-system';
+import { Audio} from "expo-av";
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import {SamplesScreen} from "./screens/samplesScreen/samplesScreen";
+import {PedalboardScreen} from "./screens/pedalboardScreen/pedalboardScreen";
+import {NavigationContainer} from "@react-navigation/native";
 
+const Tab = createBottomTabNavigator();
 
+function MyTabs() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="My samples" component={SamplesScreen}/>
+      <Tab.Screen name="Pedalboard" component={PedalboardScreen}/>
+    </Tab.Navigator>
+  )
+}
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [samples, setSamples] = useState<SampleMetadata[]>([])
-
-  const restClient = Container.get(RestClient)
-
-  useEffect(() => {
-
-      restClient.getSamplesMetadata()
-        .then(samples => {
-          setSamples(samples);
-          setIsLoading(false)
-        })
-        .catch(error => {
-          console.log(error.message)
-          alert("Error fetching data")
-        })
-
-  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View>
-        {isLoading && <Text> Loading </Text>}
-      </View>
-      <ScrollView>
-        {samples.map((sample, index) =>
-          <Text key={index}>{sample.name}</Text>)}
-      </ScrollView>
-    </SafeAreaView>
-  );
+  <NavigationContainer>
+    <MyTabs/>
+  </NavigationContainer>
+  )
 }
 
 const styles = StyleSheet.create({
