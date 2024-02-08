@@ -5,6 +5,7 @@ import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
 import SoundClient from "../../network/SoundClient";
 import SampleCard from "./SampleCard";
+import Theme from "../../theme";
 
 type SamplesProps = {}
 
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: Theme.secondary
   },
   scrollContainer: {
     paddingTop: 20,

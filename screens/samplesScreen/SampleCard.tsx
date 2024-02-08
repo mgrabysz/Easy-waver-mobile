@@ -1,6 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import {Ionicons} from '@expo/vector-icons';
+import Theme from "../../theme";
 
 function trimExtension(filename: string) {
   return filename.replace(/\.[^/.]+$/, "")
@@ -29,7 +30,7 @@ const SampleCard = (props: SampleCardProps) => {
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: '#FFF',
+    backgroundColor: Theme.primary,
     padding: 15,
     borderRadius: 10,
     flexDirection: 'row',
