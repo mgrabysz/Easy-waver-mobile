@@ -1,17 +1,16 @@
-import {Alert, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
+import {Alert, SafeAreaView, ScrollView, StyleSheet} from "react-native";
 import React, {useEffect, useState} from "react";
 import {Audio} from "expo-av";
 import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
 import SoundClient from "../../network/SoundClient";
-import SampleCard from "./SampleCard";
+import SampleCard from "./components/SampleCard";
 import Theme from "../../theme";
-import Entypo from "@expo/vector-icons/Entypo";
-import {FontAwesome} from "@expo/vector-icons";
 import NewSampleModal from "./components/NewSampleModal";
 import RecordingModal from "./components/StopRecordingModal";
 import {AndroidAudioEncoder, AndroidOutputFormat} from "expo-av/build/Audio/RecordingConstants";
 import * as FileSystem from 'expo-file-system';
+import {SamplesHeader} from "./components/SamplesHeader";
 
 
 // @ts-ignore
@@ -30,20 +29,32 @@ export function SamplesScreen({navigation}) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <View style={styles.headerButtons}>
-          <TouchableOpacity style={styles.button}>
-            <Entypo name="upload" size={24} color="black"/>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => {
-            startRecording().then(() => setRecordingModalVisible(true))
-          }}>
-            <FontAwesome name="microphone" size={24} color="black"/>
-          </TouchableOpacity>
-        </View>
-      )
+      headerRight: () => <SamplesHeader onMicrophoneClicked={
+        () => startRecording().then(() => setRecordingModalVisible(true))
+      }/>
     })
   }, []);
+
+  useEffect(() => {
+    // get samples metadata
+    restClient.getSamplesMetadata()
+      .then(samples => {
+        setSampleMetadataList(samples)
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Error fetching data")
+      })
+
+    // clean up sound
+    return sound
+      ? () => {
+        console.log('Unloading Sound');
+        // @ts-ignore
+        sound.unloadAsync();
+      }
+      : undefined;
+  }, [sound])
 
   async function startRecording() {
     try {
@@ -123,27 +134,6 @@ export function SamplesScreen({navigation}) {
     return newUri;
   }
 
-  useEffect(() => {
-    // get samples metadata
-    restClient.getSamplesMetadata()
-      .then(samples => {
-        setSampleMetadataList(samples)
-      })
-      .catch(error => {
-        console.log(error)
-        alert("Error fetching data")
-      })
-
-    // clean up sound
-    return sound
-      ? () => {
-        console.log('Unloading Sound');
-        // @ts-ignore
-        sound.unloadAsync();
-      }
-      : undefined;
-  }, [sound])
-
   return (
     <SafeAreaView style={styles.container}>
       <RecordingModal
@@ -202,14 +192,4 @@ const styles = StyleSheet.create({
   scroll: {
     width: '100%',
   },
-  headerButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: "center",
-    paddingRight: 15
-  },
-  button: {
-    paddingHorizontal: 20
-  },
-
 });
