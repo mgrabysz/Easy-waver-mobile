@@ -1,6 +1,7 @@
 import axios from "axios"
 import {Service} from "typedi";
-import mockSamples from '../mockSamples.json'
+import * as FileSystem from 'expo-file-system';
+
 @Service()
 export default class RestClient {
 
@@ -11,20 +12,30 @@ export default class RestClient {
 
   public async getSamplesMetadata(): Promise<SampleMetadata[]> {
     // mock
-    return mockSamples
-    // const url = `${this.baseUrl}/files/`
-    // const response = await axios.get(url)
-    // return response.data
+    // return mockSamples
+    const url = `${this.baseUrl}/files/`
+    const response = await axios.get(url)
+    return response.data
   }
 
-  // nie udało się
-  // public async getSampleContent(): Promise<string>{
-  //   const url = `${this.baseUrl}/files/wave_FAC.wav`
-  //   const response = await axios.get(url, {
-  //     responseType: 'blob'
-  //   })
-  //   return response.data
-  // }
+  public async uploadSample(uri: string): Promise<void> {
+    console.log('Uploading sample')
+    const url = `${this.baseUrl}/files/`
+    try {
+      const response = await FileSystem.uploadAsync(url, uri, {
+        mimeType: 'audio/wav',
+        fieldName: 'file',
+        httpMethod: 'POST',
+        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log(JSON.stringify(response, null, 4));
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
 
 }

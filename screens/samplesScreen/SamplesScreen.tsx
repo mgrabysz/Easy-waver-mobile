@@ -10,6 +10,9 @@ import Entypo from "@expo/vector-icons/Entypo";
 import {FontAwesome} from "@expo/vector-icons";
 import NewSampleModal from "./components/NewSampleModal";
 import RecordingModal from "./components/StopRecordingModal";
+import {AndroidAudioEncoder, AndroidOutputFormat} from "expo-av/build/Audio/RecordingConstants";
+import * as FileSystem from 'expo-file-system';
+
 
 // @ts-ignore
 export function SamplesScreen({navigation}) {
@@ -22,6 +25,7 @@ export function SamplesScreen({navigation}) {
   const [recordingModalVisible, setRecordingModalVisible] = useState(false);
   const [newSampleModalVisible, setNewSampleModalVisible] = useState(false);
   const [recording, setRecording] = useState();
+  const [recentRecordingUri, setRecentRecordingUri] = useState('');
   const [newSampleName, setNewSampleName] = useState('');
 
   useEffect(() => {
@@ -51,7 +55,23 @@ export function SamplesScreen({navigation}) {
         });
 
         console.log('Starting recording..');
-        const {recording} = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        const {recording} = await Audio.Recording.createAsync({
+          isMeteringEnabled: true,
+          android: {
+            ...Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+            outputFormat: AndroidOutputFormat.MPEG_4,
+            audioEncoder: AndroidAudioEncoder.AAC,
+            numberOfChannels: 1
+          },
+          ios: {
+            ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
+            numberOfChannels: 1
+          },
+          web: {
+            mimeType: 'audio/wav',
+            bitsPerSecond: 128000,
+          },
+        });
         // @ts-ignore
         setRecording(recording);
         console.log('Recording started');
@@ -73,6 +93,7 @@ export function SamplesScreen({navigation}) {
     );
     // @ts-ignore
     const uri = recording.getURI();
+    setRecentRecordingUri(uri);
     console.log('Recording stopped and stored at', uri);
     return uri;
   }
@@ -91,6 +112,15 @@ export function SamplesScreen({navigation}) {
     setSound(sound);
     console.log('Playing Sound');
     await sound.playAsync();
+  }
+
+  async function renameRecording(uri: string, newName: string) {
+    const newUri = FileSystem.cacheDirectory + newName + '.m4a'
+    await FileSystem.moveAsync({
+      from: uri,
+      to: newUri
+    })
+    return newUri;
   }
 
   useEffect(() => {
@@ -137,7 +167,15 @@ export function SamplesScreen({navigation}) {
         text={newSampleName}
         onChangeText={setNewSampleName}
         onDiscard={() => setNewSampleModalVisible(false)}
-        onUpload={() => setNewSampleModalVisible(false)}/>
+        onUpload={() => {
+          setNewSampleModalVisible(false)
+          renameRecording(recentRecordingUri, newSampleName)
+            .then(newUri => {
+              restClient.uploadSample(newUri);
+              setNewSampleName('')
+              setRecentRecordingUri('')
+            })
+        }}/>
       <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
         {sampleMetadataList.map((sample, index) => {
           return (
