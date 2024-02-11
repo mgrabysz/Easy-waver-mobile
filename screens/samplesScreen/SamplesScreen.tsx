@@ -8,9 +8,11 @@ import SampleCard from "./components/SampleCard";
 import Theme from "../../theme";
 import NewSampleModal from "./components/NewSampleModal";
 import RecordingModal from "./components/StopRecordingModal";
-import {AndroidAudioEncoder, AndroidOutputFormat} from "expo-av/build/Audio/RecordingConstants";
 import * as FileSystem from 'expo-file-system';
 import {SamplesHeader} from "./components/SamplesHeader";
+import {Recording} from "expo-av/build/Audio/Recording";
+import {startRecording, stopRecording} from "../../internal/RecordingAgent";
+import LoadingActivity from "../../components/LoadingActivity";
 
 
 // @ts-ignore
@@ -20,32 +22,33 @@ export function SamplesScreen({navigation}) {
 
   const [sampleMetadataList, setSampleMetadataList] = useState<SampleMetadata[]>([])
   const [sound, setSound] = useState<Audio.Sound>();
-
-  const [recordingModalVisible, setRecordingModalVisible] = useState(false);
-  const [newSampleModalVisible, setNewSampleModalVisible] = useState(false);
-  const [recording, setRecording] = useState();
+  const [recording, setRecording] = useState<Recording>();
+  // strings
   const [recentRecordingUri, setRecentRecordingUri] = useState('');
   const [newSampleName, setNewSampleName] = useState('');
+  // booleans
+  const [newSampleModalVisible, setNewSampleModalVisible] = useState(false);
+  const [recordingModalVisible, setRecordingModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    void refreshSamplesMetadata()
+
     navigation.setOptions({
       headerRight: () => <SamplesHeader onMicrophoneClicked={
-        () => startRecording().then(() => setRecordingModalVisible(true))
-      }/>
+        () => startRecording()
+          .then((recording) => {
+            setRecording(recording);
+            setRecordingModalVisible(true)
+          })
+          .catch(() => {
+            alert("Error starting recording")
+          })}
+      />
     })
   }, []);
 
   useEffect(() => {
-    // get samples metadata
-    restClient.getSamplesMetadata()
-      .then(samples => {
-        setSampleMetadataList(samples)
-      })
-      .catch(error => {
-        console.log(error)
-        alert("Error fetching data")
-      })
-
     // clean up sound
     return sound
       ? () => {
@@ -56,57 +59,17 @@ export function SamplesScreen({navigation}) {
       : undefined;
   }, [sound])
 
-  async function startRecording() {
-    try {
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === 'granted') {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-
-        console.log('Starting recording..');
-        const {recording} = await Audio.Recording.createAsync({
-          isMeteringEnabled: true,
-          android: {
-            ...Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
-            outputFormat: AndroidOutputFormat.MPEG_4,
-            audioEncoder: AndroidAudioEncoder.AAC,
-            numberOfChannels: 1
-          },
-          ios: {
-            ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
-            numberOfChannels: 1
-          },
-          web: {
-            mimeType: 'audio/wav',
-            bitsPerSecond: 128000,
-          },
-        });
-        // @ts-ignore
-        setRecording(recording);
-        console.log('Recording started');
-      }
-    } catch (err) {
-      console.error('Failed to start recording', err);
-    }
-  }
-
-  async function stopRecording() {
-    console.log('Stopping recording..');
-    setRecording(undefined);
-    // @ts-ignore
-    await recording.stopAndUnloadAsync();
-    await Audio.setAudioModeAsync(
-      {
-        allowsRecordingIOS: false,
-      }
-    );
-    // @ts-ignore
-    const uri = recording.getURI();
-    setRecentRecordingUri(uri);
-    console.log('Recording stopped and stored at', uri);
-    return uri;
+  async function refreshSamplesMetadata(): Promise<void> {
+    setLoading(true);
+    restClient.getSamplesMetadata()
+      .then(samples => {
+        setSampleMetadataList(samples)
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Error fetching data")
+      })
+      .finally(() => setLoading(false))
   }
 
   async function playSound(sampleName: string) {
@@ -117,7 +80,7 @@ export function SamplesScreen({navigation}) {
     await sound.playAsync();
   }
 
-  async function playLocalSound(uri: string) {
+  async function playSoundFromLocalUri(uri: string) {
     console.log('Loading Sound');
     const {sound} = await Audio.Sound.createAsync({uri: uri})
     setSound(sound);
@@ -142,13 +105,21 @@ export function SamplesScreen({navigation}) {
         onForcedClose={() => {
           Alert.alert('Recording has been canceled');
           setRecordingModalVisible(!recordingModalVisible);
-          stopRecording().then()
+          stopRecording(recording).then(() => setRecording(undefined))
         }}
         onStop={() => {
           setRecordingModalVisible(!recordingModalVisible)
-          stopRecording()
-            .then(uri => playLocalSound(uri))
           setNewSampleModalVisible(!newSampleModalVisible)
+          stopRecording(recording)
+            .then(uri => {
+              if (uri != null) {
+                void playSoundFromLocalUri(uri)
+                setRecording(undefined)
+                setRecentRecordingUri(uri)
+              } else {
+                alert("Error saving recording")
+              }
+            })
         }}
       />
       <NewSampleModal
@@ -159,12 +130,14 @@ export function SamplesScreen({navigation}) {
         onDiscard={() => setNewSampleModalVisible(false)}
         onUpload={() => {
           setNewSampleModalVisible(false)
+          setLoading(true)
           renameRecording(recentRecordingUri, newSampleName)
             .then(newUri => {
-              restClient.uploadSample(newUri);
               setNewSampleName('')
               setRecentRecordingUri('')
+              return restClient.uploadSample(newUri);
             })
+            .then(refreshSamplesMetadata)
         }}/>
       <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
         {sampleMetadataList.map((sample, index) => {
@@ -173,6 +146,7 @@ export function SamplesScreen({navigation}) {
           )
         })}
       </ScrollView>
+      {loading && <LoadingActivity/>}
     </SafeAreaView>
   );
 
