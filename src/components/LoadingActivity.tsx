@@ -1,6 +1,6 @@
 import {ActivityIndicator, StyleSheet, View} from "react-native";
 import React from "react";
-import Theme from "../theme";
+import Theme from "../themes/theme";
 
 export default function LoadingActivity() {
   return (<View style={styles.loading}>

@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import {Ionicons} from '@expo/vector-icons';
-import Theme from "../../../theme";
+import Theme from "../../../themes/theme";
 
 function trimExtension(filename: string) {
   return filename.replace(/\.[^/.]+$/, "")

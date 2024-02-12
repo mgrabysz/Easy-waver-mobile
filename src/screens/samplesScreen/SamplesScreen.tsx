@@ -5,7 +5,7 @@ import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
 import SoundClient from "../../network/SoundClient";
 import SampleCard from "./components/SampleCard";
-import Theme from "../../theme";
+import Theme from "../../themes/theme";
 import NewSampleModal from "./components/NewSampleModal";
 import RecordingModal from "./components/StopRecordingModal";
 import * as FileSystem from 'expo-file-system';

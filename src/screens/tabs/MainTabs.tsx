@@ -1,11 +1,11 @@
 import React from "react";
 import {StyleSheet} from "react-native";
-import Theme from "../../theme";
 import Entypo from "@expo/vector-icons/Entypo";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {SamplesScreen} from "../samplesScreen/SamplesScreen";
 import {PedalBoardScreen} from "../pedalboardScreen/PedalBoardScreen";
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import Theme from "../../themes/theme";
 
 const Tab = createBottomTabNavigator();
 

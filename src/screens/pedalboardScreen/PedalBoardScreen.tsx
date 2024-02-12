@@ -1,5 +1,5 @@
 import {SafeAreaView, ScrollView, StyleSheet} from "react-native";
-import Theme from "../../theme";
+import Theme from "../../themes/theme";
 import InputSampleCard from "./components/InputSampleCard";
 
 export function PedalBoardScreen() {

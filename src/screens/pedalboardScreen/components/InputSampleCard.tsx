@@ -1,9 +1,9 @@
 import {StyleSheet, Text, View} from "react-native";
-import Theme from "../../../theme";
+import Theme from "../../../themes/theme";
 import {Picker} from '@react-native-picker/picker';
 import Entypo from "@expo/vector-icons/Entypo";
 import {useState} from "react";
-import mockSamples from '../../../mockSamples.json'
+import mockSamples from '../../../../mockSamples.json'
 
 const InputSampleCard = () => {
   const [selectedSample, setSelectedSample] = useState();
@@ -21,7 +21,7 @@ const InputSampleCard = () => {
             onValueChange={(itemValue, itemIndex) =>
               setSelectedSample(itemValue)
             }
-            prompt={"Select a song"}
+            prompt={"Select a sample"}
           >
             {mockSamples.map((sample, index) => {
               return (<Picker.Item key={index} label={sample.name} value={sample.id}/>)
