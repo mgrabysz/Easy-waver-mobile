@@ -1,16 +1,30 @@
-import {View, Text} from "react-native";
+import {SafeAreaView, ScrollView, StyleSheet} from "react-native";
+import Theme from "../../theme";
+import InputSampleCard from "./components/InputSampleCard";
 
 export function PedalBoardScreen() {
-  // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'samples', {intermediates: true})
-  //   .then(() => console.log('finished dupa'))
-  //   .then(() => FileSystem.downloadAsync(url, FileSystem.documentDirectory + 'samples/' + 'wave.wav'))
-  //   .then(({ uri }) => console.log('Finished downloading to ', uri))
-  //   .then(() => FileSystem.readDirectoryAsync(FileSystem.documentDirectory! + 'samples'))
-  //   .then(response => setFolderContent(response))
-  //   .catch(error => {throw error} )
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Pedalboard!</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
+        <InputSampleCard/>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Theme.secondary
+  },
+  scrollContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 20
+  },
+  scroll: {
+    width: '100%',
+  },
+});

@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     borderWidth: 1,
     padding: 10,
-    width: '100%'
+    width: '100%',
+    borderRadius: 5
   },
   decisionButtonsView: {
     flexDirection: "row",
