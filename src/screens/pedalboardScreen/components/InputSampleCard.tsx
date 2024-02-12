@@ -3,9 +3,12 @@ import Theme from "../../../themes/theme";
 import {Picker} from '@react-native-picker/picker';
 import Entypo from "@expo/vector-icons/Entypo";
 import {useState} from "react";
-import mockSamples from '../../../../mockSamples.json'
 
-const InputSampleCard = () => {
+interface InputSampleCardProps {
+  samplesMetadata: SampleMetadata[]
+}
+
+const InputSampleCard = (props: InputSampleCardProps) => {
   const [selectedSample, setSelectedSample] = useState();
   return (
     <View style={styles.item}>
@@ -23,7 +26,7 @@ const InputSampleCard = () => {
             }
             prompt={"Select a sample"}
           >
-            {mockSamples.map((sample, index) => {
+            {props.samplesMetadata.map((sample, index) => {
               return (<Picker.Item key={index} label={sample.name} value={sample.id}/>)
             })}
           </Picker>

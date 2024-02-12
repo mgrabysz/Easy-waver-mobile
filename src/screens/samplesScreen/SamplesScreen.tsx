@@ -1,5 +1,5 @@
 import {Alert, SafeAreaView, ScrollView, StyleSheet} from "react-native";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Audio} from "expo-av";
 import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
@@ -13,6 +13,7 @@ import {SamplesHeader} from "./components/SamplesHeader";
 import {Recording} from "expo-av/build/Audio/Recording";
 import {startRecording, stopRecording} from "../../internal/RecordingAgent";
 import LoadingActivity from "../../components/LoadingActivity";
+import SamplesMetadataContext from "../../contexts/SamplesMetadataContext";
 
 
 // @ts-ignore
@@ -20,7 +21,8 @@ export function SamplesScreen({navigation}) {
   const restClient = Container.get(RestClient)
   const soundClient = Container.get(SoundClient)
 
-  const [sampleMetadataList, setSampleMetadataList] = useState<SampleMetadata[]>([])
+  const {samplesMetadata, setSamplesMetadata} = useContext(SamplesMetadataContext)
+
   const [sound, setSound] = useState<Audio.Sound>();
   const [recording, setRecording] = useState<Recording>();
   // strings
@@ -63,7 +65,7 @@ export function SamplesScreen({navigation}) {
     setLoading(true);
     restClient.getSamplesMetadata()
       .then(samples => {
-        setSampleMetadataList(samples)
+        setSamplesMetadata(samples)
       })
       .catch(error => {
         console.log(error)
@@ -140,7 +142,7 @@ export function SamplesScreen({navigation}) {
             .then(refreshSamplesMetadata)
         }}/>
       <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
-        {sampleMetadataList.map((sample, index) => {
+        {samplesMetadata.map((sample, index) => {
           return (
             <SampleCard key={index} name={sample.name} onPress={() => playSound(sample.name)}></SampleCard>
           )

@@ -1,13 +1,16 @@
 import {SafeAreaView, ScrollView, StyleSheet} from "react-native";
 import Theme from "../../themes/theme";
 import InputSampleCard from "./components/InputSampleCard";
+import {useContext} from "react";
+import SamplesMetadataContext from "../../contexts/SamplesMetadataContext";
 
 export function PedalBoardScreen() {
+  const {samplesMetadata, setSamplesMetadata} = useContext(SamplesMetadataContext)
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
-        <InputSampleCard/>
+        <InputSampleCard samplesMetadata={samplesMetadata}/>
       </ScrollView>
     </SafeAreaView>
   );
