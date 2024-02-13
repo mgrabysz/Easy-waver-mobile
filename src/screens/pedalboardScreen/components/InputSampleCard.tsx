@@ -8,6 +8,10 @@ interface InputSampleCardProps {
   samplesMetadata: SampleMetadata[]
 }
 
+function trimExtension(filename: string) {
+  return filename.replace(/\.[^/.]+$/, "")
+}
+
 const InputSampleCard = (props: InputSampleCardProps) => {
   const [selectedSample, setSelectedSample] = useState();
   return (
@@ -27,7 +31,7 @@ const InputSampleCard = (props: InputSampleCardProps) => {
             prompt={"Select a sample"}
           >
             {props.samplesMetadata.map((sample, index) => {
-              return (<Picker.Item key={index} label={sample.name} value={sample.id}/>)
+              return (<Picker.Item key={index} label={trimExtension(sample.name)} value={sample.id}/>)
             })}
           </Picker>
         </View>

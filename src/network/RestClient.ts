@@ -13,10 +13,10 @@ export default class RestClient {
 
   public async getSamplesMetadata(): Promise<SampleMetadata[]> {
     // mock
-    return mockSamples
-    // const url = `${this.baseUrl}/files/`
-    // const response = await axios.get(url)
-    // return response.data
+    // return mockSamples
+    const url = `${this.baseUrl}/files/`
+    const response = await axios.get(url)
+    return response.data
   }
 
   public async uploadSample(uri: string): Promise<void> {
