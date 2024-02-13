@@ -10,3 +10,12 @@ export function getDefaultDelay(): Effect {
       time: 0.5
     }}
 }
+
+export function getDefaultFilter(): Effect {
+  return {
+    type: EffectType.FILTER,
+    params: {
+      type: 'Canonical'
+    }
+  }
+}

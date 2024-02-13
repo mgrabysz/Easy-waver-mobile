@@ -1,10 +1,25 @@
-import {Modal, StyleSheet, Text, View} from "react-native";
-import Theme from "../../../themes/theme";
+import {Modal, Text, View} from "react-native";
 import LabeledSlider from "./LabeledSlider";
 import React from "react";
 import {Picker} from "@react-native-picker/picker";
 import DecisionButtons from "../../../components/DecisionButtons";
-import {DelayModalState} from "../../../model/Delay";
+import ModalStyles from "./ModalStyles";
+
+export interface DelayModalState {
+  isVisible: boolean,
+  type: string,
+  level: number,
+  time: number
+}
+
+export function getDefaultDelayModalState(): DelayModalState {
+  return {
+    isVisible: false,
+    type: "IIR",
+    level: 0.5,
+    time: 0.5
+  }
+}
 
 interface DelayModalProps {
   state: DelayModalState
@@ -13,7 +28,7 @@ interface DelayModalProps {
   onAccept: () => void
 }
 
-export default function DelayModal(props: DelayModalProps) {
+export function DelayModal(props: DelayModalProps) {
 
   let state = props.state
 
@@ -55,49 +70,3 @@ export default function DelayModal(props: DelayModalProps) {
     </View>
   </Modal>
 }
-
-
-const ModalStyles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    flexDirection: "column",
-    alignItems: 'center',
-    padding: 35,
-    width: "80%",
-    backgroundColor: Theme.primary,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  titleContainer: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "flex-start"
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 18
-  },
-  typeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  pickerContainer: {
-    flexGrow: 1,
-    borderRadius: 5,
-    marginVertical: 20,
-    marginLeft: 20,
-    backgroundColor: "#ebeef0"
-  },
-})
