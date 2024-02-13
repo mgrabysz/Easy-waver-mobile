@@ -1,7 +1,7 @@
 import {SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Theme from "../../themes/theme";
 import InputSampleCard from "./components/InputSampleCard";
-import {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import SamplesMetadataContext from "../../contexts/SamplesMetadataContext";
 import DelayCard from "./components/DelayCard";
 import {DelayModal, DelayModalState, getDefaultDelayModalState} from "./components/DelayModal";
@@ -12,9 +12,12 @@ import {EffectTypeModal, getDefaultEffectTypeModalState} from "./components/Effe
 import {EffectType} from "../../model/EffectType";
 import {FilterModal, FilterModalState, getDefaultFilterModalState} from "./components/FilterModal";
 import FilterCard from "./components/FilterCard";
+import {PedalBoardHeader} from "./components/PedalBoardHeader";
+import {ObjectMapper} from "json-object-mapper";
 
 
-export function PedalBoardScreen() {
+// @ts-ignore
+export function PedalBoardScreen({navigation}) {
   const {samplesMetadata, setSamplesMetadata} = useContext(SamplesMetadataContext)
 
   const [effects, setEffects] = useState<Effect[]>([])
@@ -25,6 +28,15 @@ export function PedalBoardScreen() {
 
   const [delayModalState, setDelayModalState] = useState<DelayModalState>(getDefaultDelayModalState())
   const [filterModalState, setFilterModalState] = useState<FilterModalState>(getDefaultFilterModalState())
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <PedalBoardHeader onPlayClicked={()=>{
+        let stringified: String = ObjectMapper.serialize(effects[0]);
+        console.log(stringified)
+      }}/>
+    })
+  }, [effects]);
 
   function onAddEffectClicked() {
     setEffectTypeModalState({
