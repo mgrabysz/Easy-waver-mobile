@@ -23,6 +23,16 @@ export function getDefaultFilterModalState(): FilterModalState {
   }
 }
 
+export function extractFilterParams(state: FilterModalState) {
+  return {
+    type: state.type,
+    category: state.category,
+    c_freq: state.c_freq,
+    bandwidth: state.bandwidth,
+    order: state.order
+  }
+}
+
 interface FilterModalProps {
   state: FilterModalState,
   setState: (s: FilterModalState) => void,

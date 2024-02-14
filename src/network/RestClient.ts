@@ -1,7 +1,8 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
 import {Service} from "typedi";
 import * as FileSystem from 'expo-file-system';
-import mockSamples from '../../mockSamples.json'
+import {Effect} from "../model/Effect";
+import {ObjectMapper} from "json-object-mapper";
 
 @Service()
 export default class RestClient {
@@ -38,5 +39,19 @@ export default class RestClient {
     }
   }
 
-
+  public async postModulation(sourceSampleName: string, newSampleName: string, effects: Effect[]): Promise<AxiosResponse> {
+    const url = `${this.baseUrl}/modulations/`
+    const body = {
+      sample: {
+        name: sourceSampleName
+      },
+      pedalboard: {
+        // @ts-ignore
+        effects: JSON.parse(ObjectMapper.serialize(effects))
+      },
+      new_name: newSampleName
+    }
+    const response = await axios.post(url, body)
+    return response;
+  }
 }

@@ -1,15 +1,13 @@
 import {EffectType, EffectTypeSerializer} from "./EffectType";
 import {JsonProperty} from "json-object-mapper";
 
-export class Effect {
+export abstract class Effect {
 
-  constructor(type: EffectType, params: any) {
+  protected constructor(type: EffectType) {
     this.type = type;
-    this.params = params;
   }
 
   @JsonProperty({name: "effect_type", serializer: EffectTypeSerializer})
   type: EffectType
   params: any
-
 }

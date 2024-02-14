@@ -21,6 +21,14 @@ export function getDefaultDelayModalState(): DelayModalState {
   }
 }
 
+export function extractDelayParams(state: DelayModalState) {
+  return {
+    type: state.type,
+    level: state.level,
+    time: state.time
+  }
+}
+
 interface DelayModalProps {
   state: DelayModalState
   setState: (s: DelayModalState) => void

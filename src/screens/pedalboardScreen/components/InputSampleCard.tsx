@@ -2,10 +2,11 @@ import {StyleSheet, Text, View} from "react-native";
 import Theme from "../../../themes/theme";
 import {Picker} from '@react-native-picker/picker';
 import Entypo from "@expo/vector-icons/Entypo";
-import {useState} from "react";
 
 interface InputSampleCardProps {
-  samplesMetadata: SampleMetadata[]
+  samplesMetadata: SampleMetadata[],
+  selectedSample: string,
+  setSelectedSample: (s: string) => void
 }
 
 function trimExtension(filename: string) {
@@ -13,7 +14,6 @@ function trimExtension(filename: string) {
 }
 
 const InputSampleCard = (props: InputSampleCardProps) => {
-  const [selectedSample, setSelectedSample] = useState();
   return (
     <View style={styles.item}>
       <Text style={styles.text}>Select a sample</Text>
@@ -24,14 +24,14 @@ const InputSampleCard = (props: InputSampleCardProps) => {
         <View style={styles.pickerContainer}>
           <Picker
             style={styles.picker}
-            selectedValue={selectedSample}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedSample(itemValue)
-            }
+            selectedValue={props.selectedSample}
+            onValueChange={(itemValue, itemIndex) => {
+              props.setSelectedSample(itemValue)
+            }}
             prompt={"Select a sample"}
           >
             {props.samplesMetadata.map((sample, index) => {
-              return (<Picker.Item key={index} label={trimExtension(sample.name)} value={sample.id}/>)
+              return (<Picker.Item key={index} label={trimExtension(sample.name)} value={sample.name}/>)
             })}
           </Picker>
         </View>

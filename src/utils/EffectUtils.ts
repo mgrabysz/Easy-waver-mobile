@@ -1,16 +1,15 @@
 import {EffectType} from "../model/EffectType";
-import {Effect} from "../model/Effect";
+import {Delay, DelayType} from "../model/Delay";
+import {Filter, FilterCategory, FilterType} from "../model/Filter";
 
-export function getDefaultDelay(): Effect {
-  return new Effect(EffectType.DELAY, {
-    type: 'IIR',
-    level: 0.5,
-    time: 0.5
-  })
+export function getDefaultDelay(): Delay {
+  return new Delay(EffectType.DELAY,
+    DelayType.IIR,
+    0.5,
+    0.5
+  )
 }
 
-export function getDefaultFilter(): Effect {
-  return new Effect(EffectType.FILTER, {
-    type: "Canonical"
-  })
+export function getDefaultFilter(): Filter {
+  return new Filter(EffectType.FILTER, FilterType.CANONICAL, FilterCategory.LOWPASS, 400)
 }
