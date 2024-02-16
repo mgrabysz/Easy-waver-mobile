@@ -10,6 +10,11 @@ interface FilterCardProps {
   onRemove: () => void
 }
 
+function titleCaseWord(word: string) {
+  if (!word) return word;
+  return word[0].toUpperCase() + word.substr(1).toLowerCase();
+}
+
 const FilterCard = (props: FilterCardProps) => {
   return (
     <View style={styles.item}>
@@ -19,10 +24,10 @@ const FilterCard = (props: FilterCardProps) => {
         </View>
       </View>
       <View style={styles.itemRight}>
-        <Text style={styles.titleText}>{props.type} filter</Text>
+        <Text style={styles.titleText}>Filter</Text>
         <View style={styles.paramsContainer}>
           <View style={styles.labelContainer}>
-            <Text>{props.category}</Text>
+            <Text>{titleCaseWord(props.category)}</Text>
           </View>
           <View style={styles.labelContainer}>
             <Text>{props.c_freq} Hz</Text>

@@ -1,8 +1,10 @@
-import {Modal, Text, View} from "react-native";
+import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import ModalStyles from "./ModalStyles";
 import {Picker} from "@react-native-picker/picker";
 import React from "react";
+import {AntDesign} from '@expo/vector-icons';
 import DecisionButtons from "../../../components/DecisionButtons";
+import {FilterCategory} from "../../../model/Filter";
 
 export interface FilterModalState {
   isVisible: boolean,
@@ -16,8 +18,8 @@ export interface FilterModalState {
 export function getDefaultFilterModalState(): FilterModalState {
   return {
     isVisible: false,
-    type: "canonical",
-    category: "lowpass",
+    type: "BUTTER",
+    category: "LOWPASS",
     c_freq: 400,
     order: 2
   }
@@ -40,6 +42,28 @@ interface FilterModalProps {
   onAccept: () => void
 }
 
+function getFreqFieldName(category: string) {
+  switch (category) {
+    case "BANDPASS":
+    case "BANDREJECT":
+      return "Central frequency"
+    case "LOWPASS":
+    case "HIGHPASS":
+      return "Cutoff frequency"
+    default:
+      return('')
+  }
+}
+
+function isBandwidthRequired(category: string) {
+  return category == "BANDPASS" || category == "BANDREJECT"
+}
+
+function titleCaseWord(word: string) {
+  if (!word) return word;
+  return word[0].toUpperCase() + word.substr(1).toLowerCase();
+}
+
 export function FilterModal(props: FilterModalProps) {
 
   let state = props.state
@@ -55,36 +79,66 @@ export function FilterModal(props: FilterModalProps) {
           <Text style={ModalStyles.title}>Configure filter pedal</Text>
         </View>
 
-        <View style={ModalStyles.typeContainer}>
-          <Text>Filter type</Text>
-          <View style={ModalStyles.pickerContainer}>
-            <Picker
-              selectedValue={state.type}
-              onValueChange={(itemValue) => {
-                props.setState({...props.state, type: itemValue})
-              }}
-              prompt={"Select filter type"}>
-              <Picker.Item label={"Canonical"} value={"Canonical"}/>
-              <Picker.Item label={"Butter"} value={"Butter"}/>
-            </Picker>
-          </View>
-        </View>
-
-        <View style={ModalStyles.typeContainer}>
+        <View style={styles.typeContainer}>
           <Text>Filter category</Text>
-          <View style={ModalStyles.pickerContainer}>
+          <View style={styles.pickerContainer}>
             <Picker
               selectedValue={state.category}
               onValueChange={(itemValue) => {
                 props.setState({...props.state, category: itemValue})
               }}
               prompt={"Select filter category"}>
-              <Picker.Item label={"Lowpass"} value={"Lowpass"}/>
-              <Picker.Item label={"Highpass"} value={"Highpass"}/>
-              <Picker.Item label={"Bandpass"} value={"Bandpass"}/>
-              <Picker.Item label={"Bandreject"} value={"Bandreject"}/>
+              {Object.keys(FilterCategory).map(value => <Picker.Item label={titleCaseWord(value)} value={value}/>)}
             </Picker>
           </View>
+        </View>
+
+        <View style={styles.typeContainer}>
+          <Text>{getFreqFieldName(state.category) + " (Hz)"}</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => {
+              props.setState({...state, c_freq: Number(text)})
+            }}
+            value={state.c_freq.toString()}
+            autoFocus={true}
+            inputMode={"numeric"}
+          />
+        </View>
+
+        {isBandwidthRequired(state.category) && <View style={styles.typeContainer}>
+          <Text>Bandwidth (Hz)</Text>
+          <TextInput
+            style={styles.input}
+            value={state.bandwidth?.toString()}
+            defaultValue={"0"}
+            onChangeText={(text) => {
+              props.setState({...state, bandwidth: Number(text)})
+            }}
+            autoFocus={true}
+            inputMode={"numeric"}
+          />
+        </View>}
+
+        <View style={styles.orderContainer}>
+          <Text style={{flexGrow: 1}}>Order</Text>
+          <View style={styles.numberSetter}>
+            <TouchableOpacity onPress={() => {
+              if (state.order > 1) {
+                props.setState({...state, order: state.order - 1})
+              }
+            }}>
+              <AntDesign name="caretleft" size={24} color="black" />
+            </TouchableOpacity>
+            <Text>{state.order}</Text>
+            <TouchableOpacity onPress={() => {
+              props.setState({...state, order: state.order + 1})
+            }}>
+              <AntDesign name="caretright" size={24} color="black" />
+            </TouchableOpacity>
+
+          </View>
+
         </View>
         <DecisionButtons styleConfig={{marginTop: 10}} positiveText={"Accept"} negativeText={"Discard"}
                          onPositive={props.onAccept}
@@ -93,3 +147,41 @@ export function FilterModal(props: FilterModalProps) {
     </View>
   </Modal>
 }
+
+const styles = StyleSheet.create({
+  typeContainer: {
+    flexDirection: "column",
+    width: "100%",
+    marginVertical: 10
+  },
+  pickerContainer: {
+    borderRadius: 5,
+    marginTop: 10,
+    width: "100%",
+    backgroundColor: "#ebeef0"
+  },
+  input: {
+    height: 40,
+    marginTop: 10,
+    borderWidth: 1,
+    padding: 10,
+    width: '100%',
+    borderRadius: 5
+  },
+  orderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // backgroundColor: 'red',
+    width: "100%",
+    marginVertical: 10
+
+  },
+  numberSetter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexGrow: 1,
+    // backgroundColor: 'green'
+  }
+})

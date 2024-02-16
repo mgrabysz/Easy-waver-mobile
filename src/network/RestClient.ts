@@ -51,6 +51,8 @@ export default class RestClient {
       },
       new_name: newSampleName
     }
+    console.log(ObjectMapper.serialize(effects))
+    console.log(body)
     const response = await axios.post(url, body)
     return response;
   }

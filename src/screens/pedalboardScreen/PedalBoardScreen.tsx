@@ -21,7 +21,7 @@ import RestClient from "../../network/RestClient";
 export function PedalBoardScreen({navigation}) {
   const {samplesMetadata, setSamplesMetadata} = useContext(SamplesMetadataContext)
 
-  const [selectedSample, setSelectedSample] = useState('');
+  const [selectedSample, setSelectedSample] = useState(samplesMetadata.length > 0 ? samplesMetadata[0].name : '');
 
   const [effects, setEffects] = useState<Effect[]>([])
   const [activeEffect, setActiveEffect] = useState<Effect>()
@@ -37,7 +37,7 @@ export function PedalBoardScreen({navigation}) {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => <PedalBoardHeader onPlayClicked={() => {
-        restClient.postModulation(selectedSample, "New Beethoven.wav", effects).then(refreshSamplesMetadata)
+        restClient.postModulation(selectedSample, "New Beethoven2.wav", effects).then(refreshSamplesMetadata)
       }}/>
     })
   }, [effects]);
