@@ -51,7 +51,7 @@ function getFreqFieldName(category: string) {
     case "HIGHPASS":
       return "Cutoff frequency"
     default:
-      return('')
+      return ('')
   }
 }
 
@@ -88,7 +88,8 @@ export function FilterModal(props: FilterModalProps) {
                 props.setState({...props.state, category: itemValue})
               }}
               prompt={"Select filter category"}>
-              {Object.keys(FilterCategory).map(value => <Picker.Item label={titleCaseWord(value)} value={value}/>)}
+              {Object.keys(FilterCategory).map((value, index) => <Picker.Item key={index} label={titleCaseWord(value)}
+                                                                              value={value}/>)}
             </Picker>
           </View>
         </View>
@@ -128,13 +129,13 @@ export function FilterModal(props: FilterModalProps) {
                 props.setState({...state, order: state.order - 1})
               }
             }}>
-              <AntDesign name="caretleft" size={24} color="black" />
+              <AntDesign name="caretleft" size={24} color="black"/>
             </TouchableOpacity>
             <Text>{state.order}</Text>
             <TouchableOpacity onPress={() => {
               props.setState({...state, order: state.order + 1})
             }}>
-              <AntDesign name="caretright" size={24} color="black" />
+              <AntDesign name="caretright" size={24} color="black"/>
             </TouchableOpacity>
 
           </View>

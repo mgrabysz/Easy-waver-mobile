@@ -1,7 +1,7 @@
-import {EffectType} from "../../../model/EffectType";
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import ModalStyles from "./ModalStyles";
 import Theme from "../../../themes/theme";
+import {EffectType} from "../../../model/Effect";
 
 export interface EffectTypeModalState {
   effectType: EffectType,

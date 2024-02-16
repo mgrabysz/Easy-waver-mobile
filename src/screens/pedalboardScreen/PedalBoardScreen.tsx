@@ -5,16 +5,16 @@ import React, {useContext, useEffect, useState} from "react";
 import SamplesMetadataContext from "../../contexts/SamplesMetadataContext";
 import DelayCard from "./components/DelayCard";
 import {DelayModal, DelayModalState, extractDelayParams, getDefaultDelayModalState} from "./components/DelayModal";
-import {FilterModal, FilterModalState, extractFilterParams, getDefaultFilterModalState} from "./components/FilterModal";
+import {extractFilterParams, FilterModal, FilterModalState, getDefaultFilterModalState} from "./components/FilterModal";
 import {Entypo} from '@expo/vector-icons';
-import {getDefaultDelay, getDefaultFilter} from "../../utils/EffectUtils";
-import {Effect} from "../../model/Effect";
+import {Effect, EffectType} from "../../model/Effect";
 import {EffectTypeModal, getDefaultEffectTypeModalState} from "./components/EffectTypeModal";
-import {EffectType} from "../../model/EffectType";
 import FilterCard from "./components/FilterCard";
 import {PedalBoardHeader} from "./components/PedalBoardHeader";
 import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
+import {getDefaultDelay} from "../../model/Delay";
+import {getDefaultFilter} from "../../model/Filter";
 
 
 // @ts-ignore
@@ -103,11 +103,13 @@ export function PedalBoardScreen({navigation}) {
       }
     });
   }
+
   if (samplesMetadata.length > 0) {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
-          <InputSampleCard samplesMetadata={samplesMetadata} selectedSample={selectedSample} setSelectedSample={setSelectedSample}/>
+          <InputSampleCard samplesMetadata={samplesMetadata} selectedSample={selectedSample}
+                           setSelectedSample={setSelectedSample}/>
           <RenderEffectCards/>
           <View style={styles.addEffectContainer}>
             <TouchableOpacity style={styles.addEffectButton} onPress={onAddEffectClicked}>

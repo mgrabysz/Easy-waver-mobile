@@ -1,20 +1,19 @@
 import axios, {AxiosResponse} from "axios"
-import {Service} from "typedi";
+import {Container, Service} from "typedi";
 import * as FileSystem from 'expo-file-system';
 import {Effect} from "../model/Effect";
-import {ObjectMapper} from "json-object-mapper";
+import EffectMapper from "../internal/EffectMapper";
 
 @Service()
 export default class RestClient {
 
   private baseUrl = process.env.EXPO_PUBLIC_API_URL
+  private mapper = Container.get(EffectMapper)
 
   public constructor() {
   }
 
   public async getSamplesMetadata(): Promise<SampleMetadata[]> {
-    // mock
-    // return mockSamples
     const url = `${this.baseUrl}/files/`
     const response = await axios.get(url)
     return response.data
@@ -41,19 +40,17 @@ export default class RestClient {
 
   public async postModulation(sourceSampleName: string, newSampleName: string, effects: Effect[]): Promise<AxiosResponse> {
     const url = `${this.baseUrl}/modulations/`
+    const effectsDTO = this.mapper.mapEffectsToDTO(effects)
     const body = {
       sample: {
         name: sourceSampleName
       },
       pedalboard: {
-        // @ts-ignore
-        effects: JSON.parse(ObjectMapper.serialize(effects))
+        effects: effectsDTO
       },
       new_name: newSampleName
     }
-    console.log(ObjectMapper.serialize(effects))
     console.log(body)
-    const response = await axios.post(url, body)
-    return response;
+    return await axios.post(url, body);
   }
 }

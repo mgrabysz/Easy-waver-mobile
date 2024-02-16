@@ -1,13 +1,9 @@
-import {EffectType, EffectTypeSerializer} from "./EffectType";
-import {JsonProperty} from "json-object-mapper";
+export enum EffectType {
+  DELAY = "Delay",
+  FILTER = "Filter"
+}
 
-export abstract class Effect {
-
-  protected constructor(type: EffectType) {
-    this.type = type;
-  }
-
-  @JsonProperty({name: "effect_type", serializer: EffectTypeSerializer})
-  type: EffectType
+export interface Effect {
+  type: EffectType,
   params: any
 }
