@@ -1,8 +1,8 @@
 import {EffectType} from "./Effect";
 
 export enum FilterType {
-  CANONICAL = "Canonical",
-  BUTTER = "Butter"
+  CANONICAL = "canonical",
+  BUTTER = "butter"
 }
 
 export enum FilterCategory {

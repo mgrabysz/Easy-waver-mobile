@@ -1,15 +1,18 @@
 import {StyleSheet, TouchableOpacity, View} from "react-native";
-import {MaterialIcons} from '@expo/vector-icons';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import React from "react";
+import Theme from "../../../themes/theme";
 
 interface PedalBoardHeaderProps {
   onPlayClicked: () => void
+  disabled: boolean
 }
 
 export function PedalBoardHeader(props: PedalBoardHeaderProps) {
+  const buttonColor = props.disabled ? Theme.inactiveGrey : 'black'
   return <View style={styles.headerButtons}>
-    <TouchableOpacity style={styles.button} onPress={props.onPlayClicked}>
-      <MaterialIcons name="piano" size={24} color="black"/>
+    <TouchableOpacity style={styles.button} onPress={props.onPlayClicked} disabled={props.disabled}>
+      <MaterialCommunityIcons name="amplifier" size={24} color={buttonColor} />
     </TouchableOpacity>
   </View>;
 }

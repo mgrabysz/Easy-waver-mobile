@@ -16,6 +16,7 @@ function titleCaseWord(word: string) {
 }
 
 const FilterCard = (props: FilterCardProps) => {
+  const frequencyLabel = ["bandpass", "bandreject"].includes(props.category) ? "Centre" : "Cutoff"
   return (
     <View style={styles.item}>
       <View style={styles.itemLeft}>
@@ -24,13 +25,13 @@ const FilterCard = (props: FilterCardProps) => {
         </View>
       </View>
       <View style={styles.itemRight}>
-        <Text style={styles.titleText}>Filter</Text>
+        <Text style={styles.titleText}>{titleCaseWord(props.type)} filter</Text>
         <View style={styles.paramsContainer}>
           <View style={styles.labelContainer}>
             <Text>{titleCaseWord(props.category)}</Text>
           </View>
           <View style={styles.labelContainer}>
-            <Text>{props.c_freq} Hz</Text>
+            <Text>{`${frequencyLabel}: ${props.c_freq}`} Hz</Text>
           </View>
         </View>
       </View>

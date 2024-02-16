@@ -1,4 +1,5 @@
 import {SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Snackbar} from "react-native-paper";
 import Theme from "../../themes/theme";
 import InputSampleCard from "./components/InputSampleCard";
 import React, {useContext, useEffect, useState} from "react";
@@ -15,6 +16,8 @@ import {Container} from "typedi";
 import RestClient from "../../network/RestClient";
 import {getDefaultDelay} from "../../model/Delay";
 import {getDefaultFilter} from "../../model/Filter";
+import NewSampleModal from "../../components/NewSampleModal";
+import LoadingActivity from "../../components/LoadingActivity";
 
 
 // @ts-ignore
@@ -26,9 +29,13 @@ export function PedalBoardScreen({navigation}) {
   const [effects, setEffects] = useState<Effect[]>([])
   const [activeEffect, setActiveEffect] = useState<Effect>()
   const [isCreatingNew, setIsCreatingNew] = useState(true)
+  const [newSampleName, setNewSampleName] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // modals
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
   const [effectTypeModalState, setEffectTypeModalState] = useState(getDefaultEffectTypeModalState)
-
+  const [newSampleModalVisible, setNewSampleModalVisible] = useState(false);
   const [delayModalState, setDelayModalState] = useState<DelayModalState>(getDefaultDelayModalState())
   const [filterModalState, setFilterModalState] = useState<FilterModalState>(getDefaultFilterModalState())
 
@@ -36,11 +43,29 @@ export function PedalBoardScreen({navigation}) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <PedalBoardHeader onPlayClicked={() => {
-        restClient.postModulation(selectedSample, "New Beethoven2.wav", effects).then(refreshSamplesMetadata)
-      }}/>
+      headerRight: () => <PedalBoardHeader disabled={effects.length === 0} onPlayClicked={onPostModulationClicked}/>
     })
   }, [effects]);
+
+  async function uploadNewModulation(): Promise<void> {
+    setNewSampleModalVisible(false)
+    setLoading(true)
+    const uploadName = `${newSampleName}.m4a`
+    restClient.postModulation(selectedSample, uploadName, effects)
+      .then(() => {
+        return refreshSamplesMetadata()
+      })
+      .then(() => {
+        setIsSnackbarVisible(true)
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Error uploading modulation")
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
   async function refreshSamplesMetadata(): Promise<void> {
     restClient.getSamplesMetadata()
@@ -74,6 +99,11 @@ export function PedalBoardScreen({navigation}) {
       ...activeEffect.params,
       isVisible: true
     })
+  }
+
+  function onPostModulationClicked() {
+    setNewSampleName('')
+    setNewSampleModalVisible(true)
   }
 
   function RenderEffectCards() {
@@ -178,6 +208,14 @@ export function PedalBoardScreen({navigation}) {
                            setIsCreatingNew(true)
                            setEffectTypeModalState({effectType: effectType, isVisible: false})
                          }}/>
+        <NewSampleModal visible={newSampleModalVisible} setVisible={setNewSampleModalVisible} text={newSampleName}
+                        onChangeText={setNewSampleName} onDiscard={() => setNewSampleModalVisible(false)}
+                        onUpload={uploadNewModulation} onForcedClose={() => setNewSampleModalVisible(false)}/>
+
+        <Snackbar visible={isSnackbarVisible} onDismiss={() => setIsSnackbarVisible(false)} duration={3000}>
+          {`Created new sample "${newSampleName}"`}
+        </Snackbar>
+        {loading && <LoadingActivity/>}
       </SafeAreaView>
     );
   }

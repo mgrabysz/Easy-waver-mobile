@@ -6,7 +6,7 @@ import RestClient from "../../network/RestClient";
 import SoundClient from "../../network/SoundClient";
 import SampleCard from "./components/SampleCard";
 import Theme from "../../themes/theme";
-import NewSampleModal from "./components/NewSampleModal";
+import NewSampleModal from "../../components/NewSampleModal";
 import RecordingModal from "./components/StopRecordingModal";
 import * as FileSystem from 'expo-file-system';
 import {SamplesHeader} from "./components/SamplesHeader";
@@ -140,6 +140,10 @@ export function SamplesScreen({navigation}) {
               return restClient.uploadSample(newUri);
             })
             .then(refreshSamplesMetadata)
+        }}
+        onForcedClose={() => {
+          Alert.alert('Recording has been discarded');
+          setNewSampleModalVisible(false);
         }}/>
       <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
         {samplesMetadata.map((sample, index) => {
