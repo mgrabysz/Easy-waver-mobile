@@ -27,7 +27,7 @@ export default class RestClient {
     const url = `${this.baseUrl}/files/`
     const token = await this.getUserToken()
     try {
-      const response = await FileSystem.uploadAsync(url, uri, {
+      await FileSystem.uploadAsync(url, uri, {
         mimeType: 'audio/wav',
         fieldName: 'file',
         httpMethod: 'POST',
@@ -37,7 +37,6 @@ export default class RestClient {
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log(JSON.stringify(response, null, 4));
     } catch (error) {
       console.log(error);
     }
@@ -58,15 +57,6 @@ export default class RestClient {
     const token = await this.getUserToken()
     const config = this.getAuthConfig(token)
     return await axios.post(url, body, config);
-  }
-
-  public async testAuthorization() {
-    const url = `${this.baseUrl}/firebase_user`
-    const token = await this.getUserToken()
-    const config = this.getAuthConfig(token)
-    const response = await axios.get(url, config)
-    console.log(response.data)
-    return response.data
   }
 
   public async deleteSample(sampleName: string): Promise<void> {
