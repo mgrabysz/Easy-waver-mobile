@@ -9,7 +9,8 @@ function trimExtension(filename: string) {
 
 interface SampleCardProps {
   name: string
-  onPress: () => {}
+  onPlayPressed: () => void
+  onDeletePressed: () => void
 }
 
 const SampleCard = (props: SampleCardProps) => {
@@ -21,9 +22,14 @@ const SampleCard = (props: SampleCardProps) => {
         </View>
         <Text style={styles.itemText}>{trimExtension(props.name)}</Text>
       </View>
-      <TouchableOpacity style={styles.iconHolder} onPress={props.onPress}>
-        <Ionicons name="play-circle-outline" size={24} color="black"/>
-      </TouchableOpacity>
+      <View style={styles.itemRight}>
+        <TouchableOpacity style={styles.iconHolder} onPress={props.onPlayPressed}>
+          <Ionicons name="play-circle-outline" size={24} color="black"/>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconHolder} onPress={props.onDeletePressed}>
+          <Ionicons name="trash" size={24} color="black"/>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -42,6 +48,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap'
+  },
+  itemRight: {
+    flexDirection: 'row',
+    columnGap: 20
   },
   square: {
     width: 24,

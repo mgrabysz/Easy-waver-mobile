@@ -1,4 +1,4 @@
-import {Alert, SafeAreaView, ScrollView, StyleSheet} from "react-native";
+import {Alert, RefreshControl, SafeAreaView, ScrollView, StyleSheet} from "react-native";
 import React, {useContext, useEffect, useState} from "react";
 import {Audio} from "expo-av";
 import {Container} from "typedi";
@@ -32,9 +32,11 @@ export function SamplesScreen({navigation}) {
   const [newSampleModalVisible, setNewSampleModalVisible] = useState(false);
   const [recordingModalVisible, setRecordingModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    void refreshSamplesMetadata()
+    setLoading(true)
+    refreshSamplesMetadata().then(() => setLoading(false))
 
     navigation.setOptions({
       headerRight: () => <SamplesHeader onMicrophoneClicked={
@@ -62,16 +64,13 @@ export function SamplesScreen({navigation}) {
   }, [sound])
 
   async function refreshSamplesMetadata(): Promise<void> {
-    setLoading(true);
-    restClient.getSamplesMetadata()
-      .then(samples => {
-        setSamplesMetadata(samples)
-      })
-      .catch(error => {
-        console.log(error)
-        alert("Error fetching data")
-      })
-      .finally(() => setLoading(false))
+    try {
+      const samples = await restClient.getSamplesMetadata()
+      setSamplesMetadata(samples)
+    } catch (error) {
+      console.log(error)
+      alert("Error fetching data")
+    }
   }
 
   async function playSound(sampleName: string) {
@@ -140,15 +139,31 @@ export function SamplesScreen({navigation}) {
               return restClient.uploadSample(newUri);
             })
             .then(refreshSamplesMetadata)
+            .finally(() => setLoading(false))
         }}
         onForcedClose={() => {
           Alert.alert('Recording has been discarded');
           setNewSampleModalVisible(false);
         }}/>
-      <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}
+                  refreshControl={
+                    <RefreshControl refreshing={refreshing}
+                                    onRefresh={() => {
+                                      setRefreshing(true)
+                                      refreshSamplesMetadata()
+                                        .then(() => setRefreshing(false))
+                                    }}/>
+                  }>
         {samplesMetadata.map((sample, index) => {
           return (
-            <SampleCard key={index} name={sample.name} onPress={() => playSound(sample.name)}></SampleCard>
+            <SampleCard key={index} name={sample.name} onPlayPressed={() => playSound(sample.name)}
+                        onDeletePressed={() => {
+                          setLoading(true)
+                          restClient.deleteSample(sample.name)
+                            .then(refreshSamplesMetadata)
+                            .catch(() => alert("Error deleting file"))
+                            .finally(() => setLoading(false))
+                        }}/>
           )
         })}
       </ScrollView>

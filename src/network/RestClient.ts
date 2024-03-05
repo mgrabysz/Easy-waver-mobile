@@ -3,6 +3,7 @@ import {Container, Service} from "typedi";
 import * as FileSystem from 'expo-file-system';
 import {Effect} from "../model/Effect";
 import EffectMapper from "../internal/EffectMapper";
+import {FirebaseAuth} from "../../firebaseConfig";
 
 @Service()
 export default class RestClient {
@@ -15,13 +16,16 @@ export default class RestClient {
 
   public async getSamplesMetadata(): Promise<SampleMetadata[]> {
     const url = `${this.baseUrl}/files/`
-    const response = await axios.get(url)
+    const token = await this.getUserToken()
+    const config = this.getAuthConfig(token)
+    const response = await axios.get(url, config)
     return response.data
   }
 
   public async uploadSample(uri: string): Promise<void> {
     console.log('Uploading sample')
     const url = `${this.baseUrl}/files/`
+    const token = await this.getUserToken()
     try {
       const response = await FileSystem.uploadAsync(url, uri, {
         mimeType: 'audio/wav',
@@ -29,7 +33,8 @@ export default class RestClient {
         httpMethod: 'POST',
         uploadType: FileSystem.FileSystemUploadType.MULTIPART,
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
         }
       });
       console.log(JSON.stringify(response, null, 4));
@@ -50,7 +55,47 @@ export default class RestClient {
       },
       new_name: newSampleName
     }
-    console.log(body)
-    return await axios.post(url, body);
+    const token = await this.getUserToken()
+    const config = this.getAuthConfig(token)
+    return await axios.post(url, body, config);
+  }
+
+  public async testAuthorization() {
+    const url = `${this.baseUrl}/firebase_user`
+    const token = await this.getUserToken()
+    const config = this.getAuthConfig(token)
+    const response = await axios.get(url, config)
+    console.log(response.data)
+    return response.data
+  }
+
+  public async deleteSample(sampleName: string): Promise<void> {
+    const url = `${this.baseUrl}/files/${sampleName}`
+    const token = await this.getUserToken()
+    const config = this.getAuthConfig(token)
+    await axios.delete(url, config)
+  }
+
+  public async initializeStorage(): Promise<void> {
+    const url = `${this.baseUrl}/files/init}`
+    const token = await this.getUserToken()
+    const config = this.getAuthConfig(token)
+    await axios.post(url, null, config)
+  }
+
+  private async getUserToken() {
+    const token = await FirebaseAuth.currentUser?.getIdToken()
+    if (token == null) {
+      throw Error("Token could not be retrieved")
+    }
+    return token
+  }
+
+  private getAuthConfig(token: string) {
+    return {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    }
   }
 }

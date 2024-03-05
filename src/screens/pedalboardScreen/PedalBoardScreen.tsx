@@ -52,30 +52,23 @@ export function PedalBoardScreen({navigation}) {
     setLoading(true)
     const uploadName = `${newSampleName}.m4a`
     restClient.postModulation(selectedSample, uploadName, effects)
-      .then(() => {
-        return refreshSamplesMetadata()
-      })
-      .then(() => {
-        setIsSnackbarVisible(true)
-      })
+      .then(refreshSamplesMetadata)
+      .then(() => setIsSnackbarVisible(true))
       .catch(error => {
         console.log(error)
         alert("Error uploading modulation")
       })
-      .finally(() => {
-        setLoading(false)
-      })
+      .finally(() => setLoading(false))
   }
 
   async function refreshSamplesMetadata(): Promise<void> {
-    restClient.getSamplesMetadata()
-      .then(samples => {
-        setSamplesMetadata(samples)
-      })
-      .catch(error => {
-        console.log(error)
-        alert("Error fetching data")
-      })
+    try {
+      const samples = await restClient.getSamplesMetadata()
+      setSamplesMetadata(samples)
+    } catch (error) {
+      console.log(error)
+      alert("Error fetching data")
+    }
   }
 
 
