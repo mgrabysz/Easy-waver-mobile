@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TextInput, View} from "react-native";
-import Theme from "../../../themes/theme";
+import Theme from "../themes/theme";
 
 interface InputCardProps {
   title: string,

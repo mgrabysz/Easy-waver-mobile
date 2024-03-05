@@ -1,15 +1,18 @@
 import {SafeAreaView, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import React, {useContext, useState} from "react";
 import InputCard from "../../components/InputCard";
-import {AntDesign, Entypo, MaterialCommunityIcons} from "@expo/vector-icons";
-import {signInWithEmailAndPassword} from "firebase/auth";
+import {AntDesign, MaterialCommunityIcons} from "@expo/vector-icons";
+import {createUserWithEmailAndPassword} from "firebase/auth";
 import {FirebaseAuth} from "../../../firebaseConfig";
 import LoadingActivity from "../../components/LoadingActivity";
 import SignInStyles from "../styles/signInStyles";
+import {Container} from "typedi";
+import RestClient from "../../network/RestClient";
 import LoggedUserContext from "../../contexts/LoggedUserContext";
 
 // @ts-ignore
-export function SignInScreen({navigation}) {
+export function SignUpScreen() {
+  const restClient = Container.get(RestClient)
 
   const {isLogged, setIsLogged} = useContext(LoggedUserContext)
 
@@ -17,14 +20,17 @@ export function SignInScreen({navigation}) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function onSignIn() {
+  function onSignUp() {
     setLoading(true)
-    signInWithEmailAndPassword(FirebaseAuth, email, password)
+    createUserWithEmailAndPassword(FirebaseAuth, email, password)
+      .then(() => {
+        return restClient.initializeStorage()
+      })
       .then(() => setIsLogged(true))
       .catch((error) => {
         const errorMessage = error.message;
         console.log(errorMessage)
-        alert("Incorrect credentials")
+        alert("Error creating an account")
       })
       .finally(() => setLoading(false));
   }
@@ -34,16 +40,12 @@ export function SignInScreen({navigation}) {
       <ScrollView contentContainerStyle={SignInStyles.scrollContainer} style={SignInStyles.scroll}>
         <View style={SignInStyles.frame}>
           <View style={SignInStyles.square}>
-            <MaterialCommunityIcons name="sine-wave" size={64} color="black" />
+            <MaterialCommunityIcons name="sine-wave" size={64} color="black"/>
           </View>
           <InputCard title={"Email"} text={email} setText={setEmail}/>
           <InputCard title={"Password"} text={password} setText={setPassword} secure={true}/>
-          <TouchableOpacity style={SignInStyles.loginButton} onPress={onSignIn}>
-            <Text>Sign in</Text>
-            <Entypo name="login" size={24} color="black"/>
-          </TouchableOpacity>
-          <TouchableOpacity style={SignInStyles.loginButton} onPress={() => navigation.navigate('Sign up')}>
-            <Text>Create account</Text>
+          <TouchableOpacity style={SignInStyles.loginButton} onPress={onSignUp}>
+            <Text>Confirm and create account</Text>
             <AntDesign name="adduser" size={24} color="black"/>
           </TouchableOpacity>
         </View>

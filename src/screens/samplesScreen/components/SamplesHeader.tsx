@@ -5,17 +5,17 @@ import React from "react";
 
 interface SamplesHeaderProps {
   onMicrophoneClicked: () => Promise<void>
+  onSignOutClicked: () => void
 }
 
 export function SamplesHeader(props: SamplesHeaderProps) {
+
   return <View style={styles.headerButtons}>
-    <TouchableOpacity style={styles.button}>
-      <Entypo name="upload" size={24} color="black"/>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.button} onPress={
-      props.onMicrophoneClicked
-    }>
+    <TouchableOpacity style={styles.button} onPress={props.onMicrophoneClicked}>
       <FontAwesome name="microphone" size={24} color="black"/>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={props.onSignOutClicked}>
+      <Entypo name="log-out" size={24} color="black"/>
     </TouchableOpacity>
   </View>;
 }
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: "center",
-    paddingRight: 15
+    paddingRight: 10
   },
   button: {
     paddingHorizontal: 20

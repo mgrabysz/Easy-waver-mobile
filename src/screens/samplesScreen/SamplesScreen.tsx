@@ -14,6 +14,8 @@ import {Recording} from "expo-av/build/Audio/Recording";
 import {startRecording, stopRecording} from "../../internal/RecordingAgent";
 import LoadingActivity from "../../components/LoadingActivity";
 import SamplesMetadataContext from "../../contexts/SamplesMetadataContext";
+import {FirebaseAuth} from "../../../firebaseConfig";
+import LoggedUserContext from "../../contexts/LoggedUserContext";
 
 
 // @ts-ignore
@@ -21,6 +23,7 @@ export function SamplesScreen({navigation}) {
   const restClient = Container.get(RestClient)
   const soundClient = Container.get(SoundClient)
 
+  const {isLogged, setIsLogged} = useContext(LoggedUserContext)
   const {samplesMetadata, setSamplesMetadata} = useContext(SamplesMetadataContext)
 
   const [sound, setSound] = useState<Audio.Sound>();
@@ -39,15 +42,21 @@ export function SamplesScreen({navigation}) {
     refreshSamplesMetadata().then(() => setLoading(false))
 
     navigation.setOptions({
-      headerRight: () => <SamplesHeader onMicrophoneClicked={
-        () => startRecording()
-          .then((recording) => {
-            setRecording(recording);
-            setRecordingModalVisible(true)
-          })
-          .catch(() => {
-            alert("Error starting recording")
-          })}
+      headerRight: () => <SamplesHeader
+        onMicrophoneClicked={
+          () => startRecording()
+            .then((recording) => {
+              setRecording(recording);
+              setRecordingModalVisible(true)
+            })
+            .catch(() => {
+              alert("Error starting recording")
+            })}
+        onSignOutClicked={() => {
+          setIsLogged(false)
+          void FirebaseAuth.signOut()
+          setSamplesMetadata([])
+        }}
       />
     })
   }, []);

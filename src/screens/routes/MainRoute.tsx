@@ -9,7 +9,7 @@ import Theme from "../../themes/theme";
 
 const Tab = createBottomTabNavigator();
 
-export function MainTabs() {
+export function MainRoute() {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({

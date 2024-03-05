@@ -77,7 +77,7 @@ export default class RestClient {
   }
 
   public async initializeStorage(): Promise<void> {
-    const url = `${this.baseUrl}/files/init}`
+    const url = `${this.baseUrl}/files/init`
     const token = await this.getUserToken()
     const config = this.getAuthConfig(token)
     await axios.post(url, null, config)
