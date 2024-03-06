@@ -48,6 +48,10 @@ function titleCaseWord(word: string) {
   return word[0].toUpperCase() + word.substr(1).toLowerCase();
 }
 
+function getFilterTypeName(type: string) {
+  return type == "canonical" ? "Canonical" : "Butterworth"
+}
+
 function getMaxOrder(type: string) {
   return type == "canonical" ? 2 : 5
 }
@@ -84,7 +88,8 @@ export function FilterModal(props: FilterModalProps) {
                   }
                 }}
                 prompt={"Select filter category"}>
-                {Object.values(FilterType).map((value, index) => <Picker.Item key={index} label={titleCaseWord(value)}
+                {Object.values(FilterType).map((value, index) => <Picker.Item key={index}
+                                                                              label={getFilterTypeName(value)}
                                                                               value={value}/>)}
               </Picker>
             </View>
